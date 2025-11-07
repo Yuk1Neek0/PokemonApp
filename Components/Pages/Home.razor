@@ -1,0 +1,103 @@
+@page "/"
+@using PokemonApp.Models
+@using PokemonApp.Services
+@inject IPokemonApiService ApiService
+@inject IPokemonRepository Repository
+
+<h1>Pokemon Data Manager</h1>
+
+<div style="margin: 20px 0;">
+    <button class="btn btn-primary" @onclick="FetchAndSaveData" disabled="@isLoading">
+        @if (isLoading)
+        {
+            <span>Loading...</span>
+        }
+        else
+        {
+            <span>Fetch and Save Data</span>
+        }
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(statusMessage))
+{
+    <div class="alert alert-info">
+        @statusMessage
+    </div>
+}
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger">
+        Error: @errorMessage
+    </div>
+}
+
+@if (pokemonList != null && pokemonList.Count > 0)
+{
+    <h2>Pokemon List (@pokemonList.Count items from database)</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Number</th>
+                    <th>Name</th>
+                    <th>API URL</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pokemon in pokemonList)
+                {
+                    <tr>
+                        <td>@pokemon.Id</td>
+                        <td>#@pokemon.PokemonNumber</td>
+                        <td style="text-transform: capitalize;">@pokemon.Name</td>
+                        <td><small>@pokemon.Url</small></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Pokemon> pokemonList;
+    private bool isLoading = false;
+    private string statusMessage;
+    private string errorMessage;
+
+    private async Task FetchAndSaveData()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+            statusMessage = "Fetching data from PokéAPI...";
+            StateHasChanged();
+
+            // Step 1: Fetch data from API
+            var apiData = await ApiService.GetPokemonListAsync(20);
+            statusMessage = $"Fetched {apiData.Count} Pokemon from API. Saving to database...";
+            StateHasChanged();
+
+            // Step 2: Save data to database
+            await Repository.InsertAllAsync(apiData);
+            statusMessage = "Data saved to database. Retrieving from database...";
+            StateHasChanged();
+
+            // Step 3: Retrieve data from database
+            pokemonList = await Repository.GetAllAsync();
+            statusMessage = $"Successfully loaded {pokemonList.Count} Pokemon from database!";
+            isLoading = false;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            statusMessage = null;
+            isLoading = false;
+        }
+
+        StateHasChanged();
+    }
+}
