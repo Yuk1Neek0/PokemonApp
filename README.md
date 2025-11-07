@@ -78,15 +78,4 @@ Services are registered in `MauiProgram.cs`:
 3. Select your target platform (Android, iOS, Windows, or MacCatalyst)
 4. Press F5 to build and run
 
-## Requirements Met
-
-- [x] Connects to a public API and successfully deserializes the JSON response
-- [x] Implements a separate service for API calls (PokemonApiService)
-- [x] Implements a separate service for database operations (PokemonRepository)
-- [x] Correctly registers both services for Dependency Injection in MauiProgram.cs
-- [x] Saves the data from the API into a local SQLite database
-- [x] Retrieves the data from the database and displays it in the UI
-- [x] Includes a README.md file with a link to the chosen API
-- [x] Ready to be committed to a GitHub repository
-
 
