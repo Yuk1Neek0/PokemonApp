@@ -89,6 +89,4 @@ Services are registered in `MauiProgram.cs`:
 - [x] Includes a README.md file with a link to the chosen API
 - [x] Ready to be committed to a GitHub repository
 
-## License
 
-This project is for educational purposes as part of a course assignment.
